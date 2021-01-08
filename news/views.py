@@ -61,11 +61,12 @@ def fill_db(request, publication="cnn"):
 # get all news with filter on numbers
 @api_view(['GET', ])
 def get_items(request):
+    psize = 10
     items = Item.objects.all()
     ordered = sorted(items, key=lambda item: datetime.strptime(item.published_date, '%Y-%m-%d %H:%M:%S'), reverse=True)
     # ordered = sorted(items, key=operator.attrgetter('last_name'), reverse=True)
     paginator = PageNumberPagination()
-    paginator.page_size = request.data['size']
+    paginator.page_size = psize
     result_page = paginator.paginate_queryset(ordered, request)
     item_ser = ItemReadSerializer(result_page, many=True)
     return paginator.get_paginated_response(item_ser.data)
@@ -83,15 +84,23 @@ def get_channel(request):
 
 
 @api_view(['GET', ])
-def get_items_by_time(request):
+def get_items_by_filter(request):
     # items = Item.objects.all()
-    from_date = datetime.strptime(request.data['from_date'], '%Y-%m-%d %H:%M:%S')
-    to_date = datetime.strptime(request.data['to_date'], '%Y-%m-%d %H:%M:%S')
-    items = Item.objects.filter(published_date__range=(from_date, to_date))
-    ordered = sorted(items, key=lambda item: datetime.strptime(item.published_date, '%Y-%m-%d %H:%M:%S'),
-                      reverse=True)
+    psize = 10
+    if hasattr(request.data, 'from_date'):
+        from_date = datetime.strptime(request.data['from_date'], '%Y-%m-%d %H:%M:%S')
+        to_date = datetime.strptime(request.data['to_date'], '%Y-%m-%d %H:%M:%S')
+        items = Item.objects.filter(published_date__range=(from_date, to_date))
+        ordered = sorted(items, key=lambda item: datetime.strptime(item.published_date, '%Y-%m-%d %H:%M:%S'),
+                          reverse=True)
+    else:
+        items = Item.objects.all()
+        ordered = sorted(items, key=lambda item: datetime.strptime(item.published_date, '%Y-%m-%d %H:%M:%S'),
+                         reverse=True)
+    if hasattr(request.data, 'size'):
+        psize = request.data['size']
     paginator = PageNumberPagination()
-    paginator.page_size = request.data['size']
+    paginator.page_size = psize
     result_page = paginator.paginate_queryset(ordered, request)
     item_ser = ItemReadSerializer(result_page, many=True)
     return paginator.get_paginated_response(item_ser.data)
