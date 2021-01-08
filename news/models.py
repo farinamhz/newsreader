@@ -4,7 +4,7 @@ from django.db import models
 
 
 class Item(models.Model):
-    title = models.TextField(unique=True)
+    title = models.TextField()
     summary = models.TextField()
     link = models.TextField()
     image_url = models.TextField()
@@ -14,7 +14,7 @@ class Item(models.Model):
 class Channel(models.Model):
     subtitle_detail = models.TextField()
     title = models.TextField()
-    base_link = models.TextField(unique=True)
+    base_link = models.TextField()
     image = models.TextField()
     language = models.TextField()
     rights_detail = models.TextField()
