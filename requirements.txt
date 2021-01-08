@@ -1,0 +1,16 @@
+asgiref==3.3.1
+automium==0.2.6
+automium-web==0.1.1
+click==7.1.2
+Django==3.1.5
+djangorestframework==3.12.2
+feedparser==6.0.2
+Flask==1.1.2
+itsdangerous==1.1.0
+Jinja2==2.11.2
+legacy==0.1.6
+MarkupSafe==1.1.1
+pytz==2020.5
+sgmllib3k==1.0.0
+sqlparse==0.4.1
+Werkzeug==1.0.1
