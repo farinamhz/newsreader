@@ -61,7 +61,7 @@ def fill_db(request, publication="cnn"):
 # get all news with filter on numbers
 @api_view(['GET', ])
 def get_items(request):
-    psize = 10
+    psize = -1
     items = Item.objects.all()
     ordered = sorted(items, key=lambda item: datetime.strptime(item.published_date, '%Y-%m-%d %H:%M:%S'), reverse=True)
     # ordered = sorted(items, key=operator.attrgetter('last_name'), reverse=True)
