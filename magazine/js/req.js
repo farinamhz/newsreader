@@ -7,10 +7,10 @@ $().ready(function () {
       .each(function () {
         $(this).show();
       });
-      $(".js-fh5co-nav-toggle").click();
-    });
-  
-    /** Do Filter */
+    $(".js-fh5co-nav-toggle").click();
+  });
+
+  /** Do Filter */
   $("#filter_form").submit(function (e) {
     e.preventDefault();
     let from_date = $("#from_date").val();
@@ -29,14 +29,27 @@ $().ready(function () {
           let d = $(this).children("span").first().html();
           // alert(d)
           if (d < from_date || d > to_date) $(this).hide();
-          else{
+          else {
             $(this).show();
             news_count--;
-          } 
+          }
         } else $(this).hide();
       });
     $(".js-fh5co-nav-toggle").click();
   });
+
+  /** init */
+  fetch("http://127.0.0.1:8000/news/read/channel/")
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      res = data.results[0];
+      let el = `
+        <a href="${res.base_link}">${res.title}</a>
+        <br><br>
+        <img src="${res.image}" alt="CNN News" class="img-responsive" style="margin: auto;">`;
+      $("#fh5co-logo").append(el);
+    });
 
   /** Get All News */
   fetch("http://127.0.0.1:8000/news/read/items/")
@@ -50,7 +63,7 @@ $().ready(function () {
           title = title.substring(0, TITLE_CHAR_LIMIT - 1);
           title += "...";
         }
-        var el = `
+        let el = `
         <article class="col-lg-4 col-md-4 col-sm-4 col-xs-6 col-xxs-12" >
         <figure>
           <a href="${res[i].link}"><img src="${res[i].image_url}" alt="Image" class="img-responsive"></a>
