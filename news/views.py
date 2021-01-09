@@ -87,9 +87,12 @@ def get_channel(request):
 def get_items_by_filter(request):
     # items = Item.objects.all()
     psize = 10
-    if hasattr(request.data, 'from_date'):
-        from_date = datetime.strptime(request.data['from_date'], '%Y-%m-%d %H:%M:%S')
-        to_date = datetime.strptime(request.data['to_date'], '%Y-%m-%d %H:%M:%S')
+    data = request.GET
+    if data.get('from_date', False) is not False:
+        from_date_string = data['from_date'].replace('T', ' ') + ":00"
+        to_date_string = data['to_date'].replace('T', ' ') + ":59"
+        from_date = datetime.strptime(from_date_string, '%Y-%m-%d %H:%M:%S')
+        to_date = datetime.strptime(to_date_string, '%Y-%m-%d %H:%M:%S')
         items = Item.objects.filter(published_date__range=(from_date, to_date))
         ordered = sorted(items, key=lambda item: datetime.strptime(item.published_date, '%Y-%m-%d %H:%M:%S'),
                           reverse=True)
@@ -97,8 +100,9 @@ def get_items_by_filter(request):
         items = Item.objects.all()
         ordered = sorted(items, key=lambda item: datetime.strptime(item.published_date, '%Y-%m-%d %H:%M:%S'),
                          reverse=True)
-    if hasattr(request.data, 'size'):
-        psize = request.data['size']
+    if data.get('size', False) is not False:
+        psize = data['size']
+    # print(psize)
     paginator = PageNumberPagination()
     paginator.page_size = psize
     result_page = paginator.paginate_queryset(ordered, request)
