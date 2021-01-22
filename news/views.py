@@ -1,11 +1,36 @@
+from django.db.models import Count, F, Value, Func
 from django.http import JsonResponse
 import email.utils as x
 from datetime import datetime
 import feedparser
 from rest_framework.decorators import api_view
-from .models import Item, Channel
+from .models import *
 from rest_framework.pagination import PageNumberPagination
 from .serializers import ItemReadSerializer, ChannelReadSerializer
+
+
+@api_view(['GET', ])
+def search_on_items(request):
+    search_param = request.GET.get('search')
+    item_ids = Index.objects.filter(kw__icontains=search_param).values_list('items', flat=True)
+    items = Item.objects.filter(pk__in=item_ids)
+    ordered = sorted(items, key=lambda item: item.title.count(search_param)/len(item.title), reverse=True)
+    return JsonResponse({'ids': [it.id for it in ordered]})
+
+
+@api_view(['GET', ])
+def index_db(request, publication="cnn"):
+    kws = []
+    for title in Item.objects.values_list('title', flat=True):
+        kws = kws + title.split()
+    Index.objects.bulk_create([Index(kw=kw.lower()) for kw in kws if len(kw) > 3], ignore_conflicts=True)
+
+    print("the number keywords are: ", len(kws))
+
+    for instance in Index.objects.all():
+        items = Item.objects.filter(title__icontains=instance.kw)
+        instance.items.add(*items)
+        print(instance, "is completed!")
 
 
 @api_view(['GET', ])
@@ -95,7 +120,7 @@ def get_items_by_filter(request):
         to_date = datetime.strptime(to_date_string, '%Y-%m-%d %H:%M:%S')
         items = Item.objects.filter(published_date__range=(from_date, to_date))
         ordered = sorted(items, key=lambda item: datetime.strptime(item.published_date, '%Y-%m-%d %H:%M:%S'),
-                          reverse=True)
+                         reverse=True)
     else:
         items = Item.objects.all()
         ordered = sorted(items, key=lambda item: datetime.strptime(item.published_date, '%Y-%m-%d %H:%M:%S'),

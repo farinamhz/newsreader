@@ -781,3 +781,26 @@ figure figcaption {
 }
 
 /*# sourceMappingURL=style.css.map */
+
+
+
+.show-by-filter{
+  display: inline-block !important;
+}
+.hide-by-filter{
+  display: none !important;
+}
+
+.show-in-search{
+  display: inline-block !important;
+}
+.hide-from-search{
+  display: none !important;
+}
+
+.hide-by-filter.show-in-search{
+  display: none !important;
+}
+.hide-from-search.show-by-filter{
+  display: none !important;
+}

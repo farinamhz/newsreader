@@ -1,5 +1,48 @@
 const TITLE_CHAR_LIMIT = 70;
 $().ready(function () {
+  // /** Disable Search */
+  // $("#search_btn").click(function () {
+
+  // });
+  /** Do Search */
+  $("#search_btn").click(function () {
+    let param = $("#search_param").val();
+    if (param == "") {
+      $("#my_news")
+        .children("article")
+        .each(function () {
+          $(this).removeClass("hide-from-search").removeClass("show-in-search");
+        });
+      $(".js-fh5co-nav-toggle").click();
+      return;
+    }
+    fetch(`http://localhost:8000/news/read/items/search/?search=${param}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        // alert(data.ids.includes("95"));
+        // alert(data.ids.includes("86"));
+        // alert(data.ids.includes("88"));
+        $("#my_news")
+          .children("article")
+          .each(function () {
+            // if (data.ids.includes(Number($(this).attr("id").split("n")[1]))) {
+            //   console.log($(this).attr("id").split("n")[1]);
+            // }
+            if (data.ids.includes(Number($(this).attr("id").split("n")[1])))
+              $(this)
+                .removeClass("hide-from-search")
+                .addClass("show-in-search");
+            else
+              $(this)
+                .removeClass("show-in-search")
+                .addClass("hide-from-search");
+          });
+      });
+
+    // $(`#n${}`)
+    $(".js-fh5co-nav-toggle").click();
+  });
   /** Disable Filters */
   $("#show_all_btn").click(function () {
     $("#my_news")
@@ -7,6 +50,8 @@ $().ready(function () {
       .each(function () {
         $(this).show();
       });
+    $("#from_date").val("");
+    $("#to_date").val("");
     $(".js-fh5co-nav-toggle").click();
   });
 
@@ -27,13 +72,17 @@ $().ready(function () {
       .each(function () {
         if (news_count !== 0) {
           let d = $(this).children("span").first().html();
-          // alert(d)
-          if (d < from_date || d > to_date) $(this).hide();
+          if (d < from_date || d > to_date) {
+              console.log(d);
+            $(this).removeClass("show-by-filter").addClass("hide-by-filter");
+          }
+        //   $(this).hide();
           else {
-            $(this).show();
+            $(this).removeClass("hide-by-filter").addClass("show-by-filter");
+            // $(this).show();
             news_count--;
           }
-        } else $(this).hide();
+        } else $(this).removeClass("show-by-filter").addClass("hide-by-filter");
       });
     $(".js-fh5co-nav-toggle").click();
   });
@@ -64,7 +113,7 @@ $().ready(function () {
           title += "...";
         }
         let el = `
-        <article class="col-lg-4 col-md-4 col-sm-4 col-xs-6 col-xxs-12" >
+        <article class="col-lg-4 col-md-4 col-sm-4 col-xs-6 col-xxs-12 show-by-filter" id="n${res[i].id}" >
         <figure>
           <a href="${res[i].link}"><img src="${res[i].image_url}" alt="Image" class="img-responsive"></a>
         </figure>
